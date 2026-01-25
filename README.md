@@ -2,6 +2,8 @@
 
 A fun, feature-rich shopping list PWA that organizes items by store sections. Built with Next.js 16, React 19, and Firebase.
 
+<img width="440" height="766" alt="image" src="https://github.com/user-attachments/assets/da8903d7-9371-4744-8cdf-1654bf7e9a89" />
+
 ## Features
 
 ### Core Functionality
