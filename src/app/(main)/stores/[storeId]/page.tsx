@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState, useEffect, useRef } from 'react';
 import { useStore } from '@/lib/hooks/useStore';
 import { useShoppingList } from '@/lib/hooks/useShoppingList';
 import { Header } from '@/components/shared/Header';
@@ -8,9 +8,11 @@ import { FullPageLoading } from '@/components/shared/LoadingSpinner';
 import { ItemInput } from '@/components/items/ItemInput';
 import { ShoppingList } from '@/components/shopping/ShoppingList';
 import { ShoppingModeToggle } from '@/components/shopping/ShoppingModeToggle';
+import { CelebrationOverlay } from '@/components/fun/CelebrationOverlay';
 import { Button } from '@/components/ui/button';
 import { Settings, Share2 } from 'lucide-react';
 import Link from 'next/link';
+import { useSoundContext } from '@/lib/contexts/SoundContext';
 
 interface PageProps {
   params: Promise<{ storeId: string }>;
@@ -33,6 +35,30 @@ export default function StorePage({ params }: PageProps) {
     uncheckAll,
   } = useShoppingList(storeId);
 
+  const { play } = useSoundContext();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const prevCheckedCount = useRef(checkedCount);
+  const hasCelebrated = useRef(false);
+
+  // Trigger celebration when all items are checked
+  useEffect(() => {
+    const allChecked = totalCount > 0 && checkedCount === totalCount;
+    const justCompletedLastItem = checkedCount > prevCheckedCount.current;
+
+    if (allChecked && justCompletedLastItem && !hasCelebrated.current) {
+      hasCelebrated.current = true;
+      play('success');
+      setShowCelebration(true);
+    }
+
+    // Reset celebration flag when items are unchecked or list changes
+    if (!allChecked) {
+      hasCelebrated.current = false;
+    }
+
+    prevCheckedCount.current = checkedCount;
+  }, [checkedCount, totalCount, play]);
+
   if (storeLoading || listLoading) {
     return <FullPageLoading />;
   }
@@ -51,7 +77,7 @@ export default function StorePage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 grid-bg">
       <Header
         title={store.name}
         showBack
@@ -95,6 +121,11 @@ export default function StorePage({ params }: PageProps) {
         onClearChecked={clearChecked}
         onClearAll={clearAll}
         onUncheckAll={uncheckAll}
+      />
+
+      <CelebrationOverlay
+        show={showCelebration}
+        onComplete={() => setShowCelebration(false)}
       />
     </div>
   );

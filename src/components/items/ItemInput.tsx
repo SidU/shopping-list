@@ -13,6 +13,7 @@ import { ItemSuggestions } from './ItemSuggestions';
 import { useFuzzySearch } from '@/lib/hooks/useFuzzySearch';
 import { LearnedItem, StoreSection } from '@/lib/types';
 import { Plus } from 'lucide-react';
+import { useSoundContext } from '@/lib/contexts/SoundContext';
 
 interface ItemInputProps {
   learnedItems: LearnedItem[];
@@ -27,6 +28,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
   const [pendingItem, setPendingItem] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { play } = useSoundContext();
 
   const suggestions = useFuzzySearch(learnedItems, query);
 
@@ -42,6 +44,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
   }, []);
 
   const handleSelectSuggestion = (item: LearnedItem) => {
+    play('add');
     onAddItem(item.name, item.sectionId);
     setQuery('');
     setShowSuggestions(false);
@@ -50,6 +53,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
 
   const handleAddNew = () => {
     if (!query.trim()) return;
+    play('click');
     setPendingItem(query.trim());
     setShowSectionPicker(true);
     setShowSuggestions(false);
@@ -57,6 +61,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
 
   const handleSelectSection = (sectionId: string) => {
     if (pendingItem) {
+      play('add');
       onAddItem(pendingItem, sectionId);
       setPendingItem(null);
       setQuery('');
@@ -99,13 +104,17 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
               onFocus={() => setShowSuggestions(true)}
               onKeyDown={handleKeyDown}
               placeholder="Add an item..."
-              className="pr-10"
+              className="pr-10 text-base"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
               >
                 &times;
               </button>
@@ -116,6 +125,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
             size="icon"
             onClick={handleAddNew}
             disabled={!query.trim()}
+            className="shrink-0"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -146,7 +156,7 @@ export function ItemInput({ learnedItems, sections, onAddItem }: ItemInputProps)
                 key={section.id}
                 variant="outline"
                 onClick={() => handleSelectSection(section.id)}
-                className="justify-start"
+                className="justify-start active:scale-95"
               >
                 {section.name}
               </Button>

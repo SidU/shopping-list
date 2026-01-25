@@ -19,7 +19,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background grid-bg">
       <Header
         title="My Stores"
         actions={
@@ -37,11 +37,11 @@ export default function HomePage() {
       <main className="container px-4 py-6 max-w-lg mx-auto">
         {stores.length === 0 ? (
           <div className="text-center py-12 space-y-4">
-            <div className="mx-auto w-16 h-16 bg-muted rounded-2xl flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-muted rounded-2xl flex items-center justify-center glow-box-subtle">
               <ShoppingCart className="w-8 h-8 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-lg font-medium">No stores yet</h2>
+              <h2 className="text-lg font-medium glow-text-subtle">No stores yet</h2>
               <p className="text-muted-foreground text-sm">
                 Create your first store to start building your shopping list.
               </p>
@@ -66,7 +66,7 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {stores.map((store) => (
                 <StoreCard key={store.id} store={store} />
               ))}

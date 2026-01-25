@@ -3,17 +3,36 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useStores } from '@/lib/hooks/useStore';
+import { useTheme, Theme } from '@/lib/contexts/ThemeContext';
+import { useSoundContext } from '@/lib/contexts/SoundContext';
 import { Header } from '@/components/shared/Header';
 import { FullPageLoading } from '@/components/shared/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, UserPlus, User } from 'lucide-react';
+import { LogOut, UserPlus, User, Palette, Monitor, Zap, Volume2, VolumeX } from 'lucide-react';
 import { getUserByEmail, shareStore, addPendingShare } from '@/lib/firebase/firestore';
+
+const themes: { id: Theme; name: string; description: string; icon: React.ReactNode }[] = [
+  {
+    id: 'default',
+    name: 'Default',
+    description: 'Clean and minimal',
+    icon: <Monitor className="w-5 h-5" />,
+  },
+  {
+    id: 'retro',
+    name: 'Retro Futuristic',
+    description: 'Neon cyberpunk vibes',
+    icon: <Zap className="w-5 h-5" />,
+  },
+];
 
 export default function SettingsPage() {
   const { user, signOut, isLoading: authLoading } = useAuth();
   const { stores, loading: storesLoading } = useStores();
+  const { theme, setTheme } = useTheme();
+  const { enabled: soundEnabled, setEnabled: setSoundEnabled, play } = useSoundContext();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -79,10 +98,97 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background grid-bg">
       <Header title="Settings" showBack backHref="/" />
 
       <main className="container px-4 py-6 max-w-lg mx-auto space-y-6">
+        {/* Theme Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              Theme
+            </CardTitle>
+            <CardDescription>
+              Choose your visual style
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              {themes.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setTheme(t.id);
+                    play(t.id === 'retro' ? 'powerUp' : 'powerDown');
+                  }}
+                  className={`p-4 rounded-lg border-2 text-left transition-all ${
+                    theme === t.id
+                      ? 'border-primary bg-primary/10 glow-box-subtle'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={theme === t.id ? 'text-primary' : 'text-muted-foreground'}>
+                      {t.icon}
+                    </span>
+                    <span className="font-medium">{t.name}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t.description}</p>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sound Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+              Sound & Haptics
+            </CardTitle>
+            <CardDescription>
+              Audio feedback and vibration
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <button
+              onClick={() => {
+                const newValue = !soundEnabled;
+                setSoundEnabled(newValue);
+                if (newValue) {
+                  play('success');
+                }
+              }}
+              className={`w-full p-4 rounded-lg border-2 text-left transition-all flex items-center justify-between ${
+                soundEnabled
+                  ? 'border-primary bg-primary/10 glow-box-subtle'
+                  : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className={soundEnabled ? 'text-primary' : 'text-muted-foreground'}>
+                  {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                </span>
+                <div>
+                  <div className="font-medium">{soundEnabled ? 'Enabled' : 'Disabled'}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {soundEnabled ? 'Sounds and vibration on' : 'Silent mode'}
+                  </p>
+                </div>
+              </div>
+              <div className={`w-12 h-7 rounded-full transition-colors ${
+                soundEnabled ? 'bg-primary' : 'bg-muted'
+              } relative`}>
+                <div className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  soundEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`} />
+              </div>
+            </button>
+          </CardContent>
+        </Card>
+
         {/* Account Section */}
         <Card>
           <CardHeader>
@@ -141,7 +247,7 @@ export default function SettingsPage() {
                   </Button>
                 </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
-                {success && <p className="text-sm text-green-600">{success}</p>}
+                {success && <p className="text-sm text-accent">{success}</p>}
               </form>
             </CardContent>
           </Card>

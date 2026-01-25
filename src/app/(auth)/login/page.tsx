@@ -18,20 +18,20 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center grid-bg">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background grid-bg px-4">
       <div className="w-full max-w-sm space-y-8 text-center">
         <div className="space-y-4">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center glow-primary">
             <ShoppingCart className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Smart Shopping List</h1>
+          <h1 className="text-3xl font-bold tracking-tight glow-text-subtle">Smart Shopping List</h1>
           <p className="text-muted-foreground">
             Organize your shopping by store sections. Share lists with family.
           </p>

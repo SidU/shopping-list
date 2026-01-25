@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ShoppingItem, StoreSection } from '@/lib/types';
 import { SectionGroup } from './SectionGroup';
-import { ShoppingCart } from 'lucide-react';
+import { getRandomEmptyMessage } from '@/lib/utils/funMessages';
 
 interface ShoppingListProps {
   items: ShoppingItem[];
@@ -18,6 +18,12 @@ export function ShoppingList({
   onToggleItem,
   onDeleteItem,
 }: ShoppingListProps) {
+  const [emptyMessage, setEmptyMessage] = useState({ emoji: '🛒', title: '', subtitle: '' });
+
+  useEffect(() => {
+    setEmptyMessage(getRandomEmptyMessage());
+  }, []);
+
   const itemsBySection = useMemo(() => {
     const grouped = new Map<string, ShoppingItem[]>();
 
@@ -44,13 +50,11 @@ export function ShoppingList({
   if (items.length === 0) {
     return (
       <div className="text-center py-12 space-y-4">
-        <div className="mx-auto w-16 h-16 bg-muted rounded-2xl flex items-center justify-center">
-          <ShoppingCart className="w-8 h-8 text-muted-foreground" />
-        </div>
+        <div className="text-6xl animate-float">{emptyMessage.emoji}</div>
         <div className="space-y-2">
-          <h2 className="text-lg font-medium">Your list is empty</h2>
+          <h2 className="text-lg font-semibold glow-text-subtle">{emptyMessage.title}</h2>
           <p className="text-muted-foreground text-sm">
-            Start adding items using the search box above.
+            {emptyMessage.subtitle}
           </p>
         </div>
       </div>

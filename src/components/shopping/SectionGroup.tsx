@@ -30,7 +30,7 @@ export function SectionGroup({
     <div className="space-y-2">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className={`flex items-center gap-2 w-full text-left py-1 ${
+        className={`flex items-center gap-2 w-full text-left py-1 transition-colors hover:text-primary ${
           allChecked ? 'text-muted-foreground' : ''
         }`}
       >
@@ -39,7 +39,7 @@ export function SectionGroup({
         ) : (
           <ChevronDown className="w-4 h-4" />
         )}
-        <h3 className="font-medium">{section.name}</h3>
+        <h3 className="font-medium glow-text-subtle">{section.name}</h3>
         <span className="text-sm text-muted-foreground">
           {checkedCount}/{items.length}
         </span>
