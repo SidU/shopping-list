@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Shopping List
+
+A fun, feature-rich shopping list PWA that organizes items by store sections. Built with Next.js 16, React 19, and Firebase.
+
+## Features
+
+### Core Functionality
+- **Multiple Stores** - Create and manage shopping lists for different stores
+- **Section-Based Organization** - Items automatically grouped by store sections (Produce, Dairy, Bakery, etc.)
+- **Smart Learning** - App remembers which section you assign items to and suggests them next time
+- **Real-Time Sync** - Lists sync across devices via Firebase
+- **Shareable Lists** - Share stores with family members for collaborative shopping
+
+### Fun & Delightful
+- **Auto-Emojis** - Items automatically display relevant emojis (milk gets a glass of milk, bread gets a loaf, etc.)
+- **Confetti Celebration** - Burst of confetti and victory message when you check off all items
+- **Witty Empty States** - Fun messages when your list is empty ("Your cart is as empty as my promises to eat healthy")
+- **Random Loading Messages** - Entertaining messages while loading ("Consulting the grocery gods...")
+- **Sound Effects** - Satisfying audio feedback for check, uncheck, add, and delete actions
+- **Haptic Feedback** - Tactile vibration on mobile devices
+
+### Themes
+- **Default Theme** - Clean, modern light/dark mode
+- **Retro-Futuristic Theme** - Neon colors, CRT scanlines, glow effects, and cyberpunk vibes
+
+### Mobile-First Design
+- **PWA Support** - Install as an app on your phone
+- **Touch Optimized** - Large touch targets and smooth interactions
+- **Offline Ready** - Works without internet connection
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **UI**: React 19, Tailwind CSS 4, shadcn/ui components
+- **Backend**: Firebase (Firestore, Authentication)
+- **Audio**: Web Audio API (no audio files needed)
+- **Fonts**: Geist (default), Orbitron & Share Tech Mono (retro theme)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- Firebase project with Firestore and Authentication enabled
 
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/SidU/shopping-list.git
+cd shopping-list
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Fill in your Firebase configuration in `.env.local`.
 
-## Learn More
+4. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── (auth)/            # Auth pages (login)
+│   ├── (main)/            # Main app pages
+│   └── api/               # API routes
+├── components/
+│   ├── fun/               # Confetti, celebrations
+│   ├── items/             # Item input, cards, suggestions
+│   ├── shared/            # Header, loading spinner
+│   ├── shopping/          # Shopping list, sections
+│   ├── stores/            # Store cards
+│   └── ui/                # shadcn/ui components
+└── lib/
+    ├── contexts/          # Theme and Sound providers
+    ├── hooks/             # Custom React hooks
+    ├── services/          # Firebase services
+    └── utils/             # Emojis, fun messages, helpers
+```
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
