@@ -12,12 +12,17 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google' && user.email) {
-        await createUser({
-          id: user.id,
-          email: user.email,
-          name: user.name || '',
-          image: user.image || undefined,
-        });
+        try {
+          await createUser({
+            id: user.id,
+            email: user.email,
+            name: user.name || '',
+            image: user.image || undefined,
+          });
+        } catch (error) {
+          console.error('Error creating user in Firestore:', error);
+          // Don't block sign-in if Firestore fails
+        }
       }
       return true;
     },
@@ -40,6 +45,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
+  debug: process.env.NODE_ENV === 'development',
 };
 
 const handler = NextAuth(authOptions);
