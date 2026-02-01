@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { adminDb, isAdminConfigured } from '@/lib/firebase/admin';
 import { checkRateLimit, rateLimitHeaders } from './ratelimit';
 
@@ -36,6 +36,17 @@ export function generateApiKey(): { key: string; hash: string } {
  * Returns user info if valid, error otherwise
  */
 export async function validateApiKey(req: NextRequest): Promise<ApiAuthResult> {
+  return validateApiKeyWithRateLimit(req, false);
+}
+
+/**
+ * Validate API key with rate limiting
+ * Use this for all API routes to ensure consistent rate limiting
+ */
+export async function validateApiKeyWithRateLimit(
+  req: NextRequest,
+  applyRateLimit: boolean = true
+): Promise<(ApiAuthResult & { rateLimitHeaders?: Record<string, string> })> {
   if (!isAdminConfigured || !adminDb) {
     return {
       success: false,
@@ -86,6 +97,21 @@ export async function validateApiKey(req: NextRequest): Promise<ApiAuthResult> {
 
   const userDoc = snapshot.docs[0];
   const userData = userDoc.data();
+
+  // Apply rate limiting if enabled
+  if (applyRateLimit) {
+    const rateLimit = await checkRateLimit(userDoc.id);
+    const rlHeaders = rateLimitHeaders(rateLimit);
+    
+    if (!rateLimit.success) {
+      return {
+        success: false,
+        error: 'Rate limit exceeded. Try again later.',
+        status: 429,
+        rateLimitHeaders: rlHeaders,
+      } as ApiAuthResult & { rateLimitHeaders?: Record<string, string> };
+    }
+  }
 
   // Update last used timestamp (fire and forget)
   userDoc.ref.update({

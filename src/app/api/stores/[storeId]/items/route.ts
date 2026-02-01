@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
-import { validateApiKey, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
+import { validateApiKeyWithRateLimit, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
 import { FieldValue } from 'firebase-admin/firestore';
 
 interface RouteParams {
@@ -12,9 +12,9 @@ interface RouteParams {
  * List all items in a store's shopping list
  */
 export async function GET(req: NextRequest, { params }: RouteParams) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {
@@ -47,9 +47,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
  *   or  { items: Array<{ name: string, sectionId: string }> }
  */
 export async function POST(req: NextRequest, { params }: RouteParams) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {
@@ -83,16 +83,31 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     return apiError('Missing name or items in request body', 400);
   }
 
+  // Security: Limit items per request
+  if (itemsToAdd.length > 100) {
+    return apiError('Maximum 100 items per request', 400);
+  }
+
   // Validate items
   for (const item of itemsToAdd) {
     if (!item.name || typeof item.name !== 'string') {
       return apiError('Each item must have a name', 400);
+    }
+    // Security: Limit item name length
+    if (item.name.length > 500) {
+      return apiError('Item name too long (maximum 500 characters)', 400);
     }
   }
 
   // Get or create shopping list
   const listRef = adminDb.doc(`stores/${storeId}/shoppingList/current`);
   const listDoc = await listRef.get();
+
+  // Security: Limit total items in list
+  const existingItems = listDoc.data()?.items || [];
+  if (existingItems.length + itemsToAdd.length > 1000) {
+    return apiError(`Shopping list would exceed maximum size (1000 items). Current: ${existingItems.length}, adding: ${itemsToAdd.length}`, 400);
+  }
 
   // Create new items
   const newItems = itemsToAdd.map((item) => ({

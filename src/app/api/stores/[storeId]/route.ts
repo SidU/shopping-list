@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
-import { validateApiKey, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
+import { validateApiKeyWithRateLimit, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
 
 interface RouteParams {
   params: Promise<{ storeId: string }>;
@@ -11,9 +11,9 @@ interface RouteParams {
  * Get store details including sections
  */
 export async function GET(req: NextRequest, { params }: RouteParams) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {
