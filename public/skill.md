@@ -50,6 +50,35 @@ Returns all stores you own or have access to.
 }
 ```
 
+### Create Store
+```
+POST /api/stores
+Content-Type: application/json
+
+{"name": "Home Depot"}
+```
+Creates a new store with default sections.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "store": {
+      "id": "xyz789",
+      "name": "Home Depot",
+      "isOwner": true,
+      "sections": [...]
+    }
+  }
+}
+```
+
+**Limits:**
+- Max 20 stores per user
+- Store names must be unique (per user)
+- Name max 100 characters
+
 ### Get Store Details
 ```
 GET /api/stores/{storeId}

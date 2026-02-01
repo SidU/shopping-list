@@ -25,6 +25,33 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
+ * Store name validation - allows letters, numbers, spaces, and common punctuation
+ * Supports Unicode characters for international names
+ */
+export const storeNameSchema = z
+  .string()
+  .min(1, 'Store name cannot be empty')
+  .max(100, 'Store name too long (maximum 100 characters)')
+  .regex(
+    /^[\p{L}\p{N}\p{M}\s\-.,&'!?()#@%+=/\\:;"]+$/u,
+    'Store name contains invalid characters'
+  )
+  .transform(val => val.trim());
+
+/**
+ * Validate store name
+ * @throws {Error} if store name is invalid
+ */
+export function validateStoreName(name: string): string {
+  const result = storeNameSchema.safeParse(name);
+  if (!result.success) {
+    const issues = result.error.issues || [];
+    throw new Error(issues[0]?.message || 'Invalid store name');
+  }
+  return result.data;
+}
+
+/**
  * Item name validation - allows letters, numbers, spaces, and common punctuation
  * Supports Unicode characters for international names
  */
