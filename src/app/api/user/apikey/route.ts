@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
   const { key, hash } = generateApiKey();
 
   // Store hash in user document
-  const userRef = adminDb.doc(`users/${userId}`);
   await userRef.update({
     apiKeyHash: hash,
     apiKeyCreatedAt: new Date(),
