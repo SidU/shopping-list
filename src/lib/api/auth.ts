@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash, timingSafeEqual } from 'crypto';
+import { createHash } from 'crypto';
 import { adminDb, isAdminConfigured } from '@/lib/firebase/admin';
 import { checkRateLimit, rateLimitHeaders } from './ratelimit';
+
+/**
+ * Minimum response time for auth operations to prevent timing attacks
+ */
+const MIN_AUTH_RESPONSE_TIME_MS = 100;
 
 export type ApiAuthResult = {
   success: true;
@@ -42,43 +47,55 @@ export async function validateApiKey(req: NextRequest): Promise<ApiAuthResult> {
 /**
  * Validate API key with rate limiting
  * Use this for all API routes to ensure consistent rate limiting
+ * Implements timing attack protection with minimum response time
  */
 export async function validateApiKeyWithRateLimit(
   req: NextRequest,
   applyRateLimit: boolean = true
 ): Promise<(ApiAuthResult & { rateLimitHeaders?: Record<string, string> })> {
+  const startTime = Date.now();
+
+  // Helper to ensure minimum response time (prevents timing attacks)
+  const withMinTime = async <T>(result: T): Promise<T> => {
+    const elapsed = Date.now() - startTime;
+    if (elapsed < MIN_AUTH_RESPONSE_TIME_MS) {
+      await new Promise(resolve => setTimeout(resolve, MIN_AUTH_RESPONSE_TIME_MS - elapsed));
+    }
+    return result;
+  };
+
   if (!isAdminConfigured || !adminDb) {
-    return {
+    return withMinTime({
       success: false,
       error: 'API not configured',
       status: 503,
-    };
+    });
   }
 
   const authHeader = req.headers.get('authorization');
   if (!authHeader) {
-    return {
+    return withMinTime({
       success: false,
       error: 'Missing Authorization header',
       status: 401,
-    };
+    });
   }
 
   if (!authHeader.startsWith('Bearer ')) {
-    return {
+    return withMinTime({
       success: false,
       error: 'Invalid Authorization header format. Use: Bearer <api-key>',
       status: 401,
-    };
+    });
   }
 
   const apiKey = authHeader.slice(7);
   if (!apiKey || !apiKey.startsWith('sk_')) {
-    return {
+    return withMinTime({
       success: false,
       error: 'Invalid API key format',
       status: 401,
-    };
+    });
   }
 
   const keyHash = hashApiKey(apiKey);
@@ -88,11 +105,11 @@ export async function validateApiKeyWithRateLimit(
   const snapshot = await usersRef.where('apiKeyHash', '==', keyHash).get();
 
   if (snapshot.empty) {
-    return {
+    return withMinTime({
       success: false,
       error: 'Invalid API key',
       status: 401,
-    };
+    });
   }
 
   const userDoc = snapshot.docs[0];

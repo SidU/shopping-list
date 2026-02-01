@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore';
 import { db, isConfigured } from './config';
 import { User, Store, ShoppingList, ShoppingItem, LearnedItem, StoreSection, DEFAULT_SECTIONS } from '../types';
+import { validateEmail } from '../validation';
 
 // Helper to get db with type safety
 const getDb = (): Firestore => {
@@ -198,10 +199,13 @@ export const unshareStore = async (storeId: string, userId: string) => {
 };
 
 export const addPendingShare = async (storeId: string, email: string) => {
+  // Validate email format before storing
+  const validatedEmail = validateEmail(email);
+
   const database = getDb();
   const storeRef = doc(database, 'stores', storeId);
   await updateDoc(storeRef, {
-    pendingShares: arrayUnion(email.toLowerCase()),
+    pendingShares: arrayUnion(validatedEmail),
     updatedAt: Timestamp.now(),
   });
 };

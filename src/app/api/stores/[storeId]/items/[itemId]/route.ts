@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { validateApiKeyWithRateLimit, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
+import { validateItemName } from '@/lib/validation';
 
 interface RouteParams {
   params: Promise<{ storeId: string; itemId: string }>;
@@ -71,11 +72,12 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     item.sectionId = updates.sectionId;
   }
   if (updates.name !== undefined) {
-    // Security: Limit item name length
-    if (updates.name.length > 500) {
-      return apiError('Item name too long (maximum 500 characters)', 400);
+    // Security: Validate item name (length, characters)
+    try {
+      item.name = validateItemName(updates.name);
+    } catch (err) {
+      return apiError(err instanceof Error ? err.message : 'Invalid item name', 400);
     }
-    item.name = updates.name.trim();
   }
 
   items[itemIndex] = item;

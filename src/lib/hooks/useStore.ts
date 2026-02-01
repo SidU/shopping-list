@@ -15,6 +15,7 @@ import {
   getUserByEmail,
 } from '../firebase/firestore';
 import { Store, StoreSection } from '../types';
+import { validateEmail } from '../validation';
 
 export function useStores() {
   const { user } = useAuth();
@@ -109,7 +110,8 @@ export function useStore(storeId: string) {
   };
 
   const share = async (email: string) => {
-    const normalizedEmail = email.toLowerCase().trim();
+    // Validate email format
+    const normalizedEmail = validateEmail(email);
 
     if (user?.email?.toLowerCase() === normalizedEmail) {
       throw new Error('Cannot share with yourself');
