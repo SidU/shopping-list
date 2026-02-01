@@ -2,7 +2,7 @@
 
 Add items to shopping lists via API. Multi-store support with section-based organization.
 
-**API Base:** `https://shopping-list-gilt.vercel.app/api`
+**API Base:** `https://shopping.uppal.zone/api`
 **Auth:** Bearer token (API key from Settings)
 
 ---
