@@ -13,7 +13,9 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/manifest.json') ||
     pathname.startsWith('/icons') ||
-    pathname === '/skill.md'
+    pathname === '/skill.md' ||
+    pathname === '/privacy.md' ||
+    pathname === '/terms.md'
   ) {
     return NextResponse.next();
   }
