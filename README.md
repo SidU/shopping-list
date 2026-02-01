@@ -30,6 +30,12 @@ A fun, feature-rich shopping list PWA that organizes items by store sections. Bu
 - **Touch Optimized** - Large touch targets and smooth interactions
 - **Offline Ready** - Works without internet connection
 
+### API & Integrations
+- **REST API** - Full API for external integrations (list stores, add/update/delete items)
+- **[OpenClaw](https://openclaw.ai) Ready** - Works with OpenClaw AI agents via the public skill definition at `/skill.md`
+- **API Key Authentication** - Generate API keys in Settings for secure access
+- **Rate Limiting** - Built-in rate limiting (100 requests/minute) via Upstash Redis
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 with App Router
