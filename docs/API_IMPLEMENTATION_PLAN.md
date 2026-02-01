@@ -66,7 +66,7 @@ The shopping list app currently uses direct Firebase client SDK calls. We're add
 - [x] `POST /api/user/apikey` - Generate key (requires session auth)
 - [x] `DELETE /api/user/apikey` - Revoke key
 - [x] `GET /api/user/apikey` - Check key status
-- [ ] UI component for key management in settings
+- [x] UI component for key management in settings (`ApiKeyCard`)
 
 ### Phase 4: Polish
 - [ ] Rate limiting

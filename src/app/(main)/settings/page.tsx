@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogOut, UserPlus, User, Palette, Monitor, Zap, Volume2, VolumeX } from 'lucide-react';
 import { getUserByEmail, shareStore, addPendingShare } from '@/lib/firebase/firestore';
+import { ApiKeyCard } from '@/components/settings/ApiKeyCard';
 
 const themes: { id: Theme; name: string; description: string; icon: React.ReactNode }[] = [
   {
@@ -218,6 +219,9 @@ export default function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* API Key Section */}
+        <ApiKeyCard />
 
         {/* Share All Stores Section */}
         {ownedStores.length > 0 && (
