@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { adminDb, isAdminConfigured } from '@/lib/firebase/admin';
 import { checkRateLimit, rateLimitHeaders } from './ratelimit';
 
-export interface ApiAuthResult {
+export type ApiAuthResult = {
   success: true;
   userId: string;
   email: string;
