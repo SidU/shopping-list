@@ -1,15 +1,15 @@
 import { NextRequest } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
-import { validateApiKey, apiError, apiSuccess } from '@/lib/api/auth';
+import { validateApiKeyWithRateLimit, apiError, apiSuccess } from '@/lib/api/auth';
 
 /**
  * GET /api/stores
  * List all stores accessible by the authenticated user
  */
 export async function GET(req: NextRequest) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {

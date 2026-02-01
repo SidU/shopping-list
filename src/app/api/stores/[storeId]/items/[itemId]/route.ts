@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
-import { validateApiKey, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
+import { validateApiKeyWithRateLimit, canAccessStore, apiError, apiSuccess } from '@/lib/api/auth';
 
 interface RouteParams {
   params: Promise<{ storeId: string; itemId: string }>;
@@ -13,9 +13,9 @@ interface RouteParams {
  * Body: { checked?: boolean, sectionId?: string, name?: string }
  */
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {
@@ -71,6 +71,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     item.sectionId = updates.sectionId;
   }
   if (updates.name !== undefined) {
+    // Security: Limit item name length
+    if (updates.name.length > 500) {
+      return apiError('Item name too long (maximum 500 characters)', 400);
+    }
     item.name = updates.name.trim();
   }
 
@@ -90,9 +94,9 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
  * Remove an item from the shopping list
  */
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
-  const auth = await validateApiKey(req);
+  const auth = await validateApiKeyWithRateLimit(req, true);
   if (!auth.success) {
-    return apiError(auth.error, auth.status);
+    return apiError(auth.error, auth.status, auth.rateLimitHeaders);
   }
 
   if (!adminDb) {

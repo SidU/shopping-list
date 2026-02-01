@@ -22,11 +22,24 @@ export async function POST(req: NextRequest) {
 
   const userId = session.user.id;
 
+  // Security: Rate limit key generation (max 1 per hour)
+  const userRef = adminDb.doc(`users/${userId}`);
+  const userDoc = await userRef.get();
+  const userData = userDoc.data();
+  
+  if (userData?.apiKeyCreatedAt) {
+    const createdAt = userData.apiKeyCreatedAt.toDate?.() || new Date(userData.apiKeyCreatedAt);
+    const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    if (createdAt > hourAgo) {
+      const waitMinutes = Math.ceil((createdAt.getTime() + 60 * 60 * 1000 - Date.now()) / 60000);
+      return apiError(`API key was recently generated. Please wait ${waitMinutes} minutes before generating a new one.`, 429);
+    }
+  }
+
   // Generate new key
   const { key, hash } = generateApiKey();
 
   // Store hash in user document
-  const userRef = adminDb.doc(`users/${userId}`);
   await userRef.update({
     apiKeyHash: hash,
     apiKeyCreatedAt: new Date(),
