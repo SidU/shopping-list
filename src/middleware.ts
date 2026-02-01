@@ -17,6 +17,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow API routes with Bearer token auth (they handle their own auth)
+  if (pathname.startsWith('/api/stores') && req.headers.get('authorization')?.startsWith('Bearer ')) {
+    return NextResponse.next();
+  }
+
   // Check for session token
   const token = await getToken({
     req,

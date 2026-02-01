@@ -6,6 +6,10 @@ export interface User {
   name: string;
   image?: string;
   createdAt: Timestamp;
+  // API access
+  apiKeyHash?: string;           // SHA-256 hash of API key
+  apiKeyCreatedAt?: Timestamp;   // When key was generated
+  apiKeyLastUsed?: Timestamp;    // Last API request
 }
 
 export interface Store {
