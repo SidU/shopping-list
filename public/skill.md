@@ -200,4 +200,9 @@ await fetch(`/api/stores/${grocery.id}/items`, {
 
 ## Rate Limits
 
-None currently. Be reasonable.
+- **100 requests per minute** per user
+- Headers included in every response:
+  - `X-RateLimit-Limit`: Max requests per window
+  - `X-RateLimit-Remaining`: Requests left
+  - `X-RateLimit-Reset`: Unix timestamp when limit resets
+- `429 Too Many Requests` if exceeded

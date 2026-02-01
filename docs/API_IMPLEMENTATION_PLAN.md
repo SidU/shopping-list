@@ -69,9 +69,9 @@ The shopping list app currently uses direct Firebase client SDK calls. We're add
 - [x] UI component for key management in settings (`ApiKeyCard`)
 
 ### Phase 4: Polish
-- [ ] Rate limiting
+- [x] Rate limiting (Upstash Redis, 100 req/min per user)
 - [ ] API documentation (OpenAPI/Swagger)
-- [ ] Error handling standardization
+- [x] Error handling standardization
 
 ## Security Model
 

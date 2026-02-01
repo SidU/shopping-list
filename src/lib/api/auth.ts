@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { adminDb, isAdminConfigured } from '@/lib/firebase/admin';
+import { checkRateLimit, rateLimitHeaders } from './ratelimit';
 
 export interface ApiAuthResult {
   success: true;
@@ -117,25 +118,33 @@ export async function canAccessStore(userId: string, storeId: string): Promise<b
 /**
  * Helper to create error response
  */
-export function apiError(error: string, status: number = 400) {
+export function apiError(
+  error: string,
+  status: number = 400,
+  headers?: Record<string, string>
+) {
   return NextResponse.json(
     { success: false, error: { message: error } },
-    { status }
+    { status, headers }
   );
 }
 
 /**
  * Helper to create success response
  */
-export function apiSuccess<T>(data: T, status: number = 200) {
+export function apiSuccess<T>(
+  data: T,
+  status: number = 200,
+  headers?: Record<string, string>
+) {
   return NextResponse.json(
     { success: true, data },
-    { status }
+    { status, headers }
   );
 }
 
 /**
- * Wrapper for API route handlers with auth
+ * Wrapper for API route handlers with auth + rate limiting
  */
 export function withApiAuth(
   handler: (
@@ -144,12 +153,29 @@ export function withApiAuth(
   ) => Promise<NextResponse>
 ) {
   return async (req: NextRequest, { params }: { params: Record<string, string> }) => {
+    // Validate API key first
     const auth = await validateApiKey(req);
     
     if (!auth.success) {
       return apiError(auth.error, auth.status);
     }
 
-    return handler(req, { params, userId: auth.userId, email: auth.email });
+    // Check rate limit (by userId)
+    const rateLimit = await checkRateLimit(auth.userId);
+    const rlHeaders = rateLimitHeaders(rateLimit);
+
+    if (!rateLimit.success) {
+      return apiError('Rate limit exceeded. Try again later.', 429, rlHeaders);
+    }
+
+    // Call the handler and add rate limit headers to response
+    const response = await handler(req, { params, userId: auth.userId, email: auth.email });
+    
+    // Add rate limit headers to successful response
+    Object.entries(rlHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
   };
 }
