@@ -15,7 +15,7 @@ import {
   Firestore,
 } from 'firebase/firestore';
 import { db, isConfigured } from './config';
-import { User, Store, ShoppingList, ShoppingItem, LearnedItem, StoreSection, DEFAULT_SECTIONS } from '../types';
+import { User, Store, ShoppingList, ShoppingItem, LearnedItem, StoreSection, StoreLocation, DEFAULT_SECTIONS } from '../types';
 import { validateEmail } from '../validation';
 
 // Helper to get db with type safety
@@ -97,7 +97,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 };
 
 // Stores
-export const createStore = async (name: string, ownerId: string): Promise<string> => {
+export const createStore = async (name: string, ownerId: string, location?: StoreLocation): Promise<string> => {
   const database = getDb();
   const storeId = generateId();
   const sections: StoreSection[] = DEFAULT_SECTIONS.map((section) => ({
@@ -105,7 +105,7 @@ export const createStore = async (name: string, ownerId: string): Promise<string
     id: generateId(),
   }));
 
-  await setDoc(doc(database, 'stores', storeId), {
+  const storeData: Record<string, unknown> = {
     name,
     ownerId,
     sharedWith: [],
@@ -113,7 +113,14 @@ export const createStore = async (name: string, ownerId: string): Promise<string
     sections,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
-  });
+  };
+
+  // Only add location if provided
+  if (location) {
+    storeData.location = location;
+  }
+
+  await setDoc(doc(database, 'stores', storeId), storeData);
 
   // Initialize empty shopping list
   await setDoc(doc(database, 'stores', storeId, 'shoppingList', 'current'), {

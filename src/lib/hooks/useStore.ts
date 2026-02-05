@@ -14,7 +14,7 @@ import {
   subscribeToStore,
   getUserByEmail,
 } from '../firebase/firestore';
-import { Store, StoreSection } from '../types';
+import { Store, StoreSection, StoreLocation } from '../types';
 import { validateEmail } from '../validation';
 
 export function useStores() {
@@ -42,9 +42,9 @@ export function useStores() {
     fetchStores();
   }, [fetchStores]);
 
-  const addStore = async (name: string) => {
+  const addStore = async (name: string, location?: StoreLocation) => {
     if (!user?.id) throw new Error('Not authenticated');
-    const storeId = await createStore(name, user.id);
+    const storeId = await createStore(name, user.id, location);
     await fetchStores();
     return storeId;
   };
