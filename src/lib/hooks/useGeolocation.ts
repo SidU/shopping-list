@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface GeolocationState {
   latitude: number | null;
@@ -96,36 +96,112 @@ function toRad(deg: number): number {
   return deg * (Math.PI / 180);
 }
 
+export interface NearbyPlace {
+  name: string;
+  placeId: string;
+  lat: number;
+  lng: number;
+  address?: string;
+}
+
 /**
- * Find the nearest store from a list of stores
+ * Find nearby places matching a store name using Google Places API
  */
-export function findNearestStore<T extends { id: string; location?: { latitude: number; longitude: number } }>(
-  stores: T[],
+export async function findNearbyPlace(
+  storeName: string,
   userLat: number,
-  userLon: number
-): { store: T; distance: number } | null {
-  const storesWithLocation = stores.filter(s => s.location);
-  
-  if (storesWithLocation.length === 0) {
+  userLng: number,
+  radiusMeters: number = 5000
+): Promise<NearbyPlace | null> {
+  try {
+    const params = new URLSearchParams({
+      name: storeName,
+      lat: userLat.toString(),
+      lng: userLng.toString(),
+      radius: radiusMeters.toString(),
+    });
+
+    const response = await fetch(`/api/places/nearby?${params}`);
+    
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (!data.places?.length) {
+      return null;
+    }
+
+    // Return the closest matching place
+    // Google already sorts by relevance, but let's also factor in distance
+    let closest: NearbyPlace | null = null;
+    let closestDistance = Infinity;
+
+    for (const place of data.places) {
+      const distance = calculateDistance(userLat, userLng, place.lat, place.lng);
+      if (distance < closestDistance) {
+        closest = place;
+        closestDistance = distance;
+      }
+    }
+
+    return closest;
+  } catch (error) {
+    console.error('Error finding nearby place:', error);
     return null;
   }
+}
 
-  let nearest: { store: T; distance: number } | null = null;
+export interface NearbyStoreMatch {
+  storeId: string;
+  storeName: string;
+  place: NearbyPlace;
+  distance: number;
+}
 
-  for (const store of storesWithLocation) {
-    if (!store.location) continue;
-    
-    const distance = calculateDistance(
-      userLat,
-      userLon,
-      store.location.latitude,
-      store.location.longitude
-    );
+/**
+ * Find the nearest store from a list by checking Google Places for each
+ */
+export async function findNearestStoreByPlaces(
+  stores: Array<{ id: string; name: string }>,
+  userLat: number,
+  userLng: number,
+  maxDistanceKm: number = 5
+): Promise<NearbyStoreMatch | null> {
+  const matches: NearbyStoreMatch[] = [];
 
-    if (!nearest || distance < nearest.distance) {
-      nearest = { store, distance };
+  // Check each store in parallel
+  const results = await Promise.all(
+    stores.map(async (store) => {
+      const place = await findNearbyPlace(store.name, userLat, userLng);
+      if (place) {
+        const distance = calculateDistance(userLat, userLng, place.lat, place.lng);
+        if (distance <= maxDistanceKm) {
+          return {
+            storeId: store.id,
+            storeName: store.name,
+            place,
+            distance,
+          };
+        }
+      }
+      return null;
+    })
+  );
+
+  // Filter out nulls and find the closest
+  for (const result of results) {
+    if (result) {
+      matches.push(result);
     }
   }
 
-  return nearest;
+  if (matches.length === 0) {
+    return null;
+  }
+
+  // Sort by distance and return closest
+  matches.sort((a, b) => a.distance - b.distance);
+  return matches[0];
 }

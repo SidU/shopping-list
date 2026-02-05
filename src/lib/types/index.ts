@@ -12,11 +12,6 @@ export interface User {
   apiKeyLastUsed?: Timestamp;    // Last API request
 }
 
-export interface StoreLocation {
-  latitude: number;
-  longitude: number;
-}
-
 export interface Store {
   id: string;
   name: string;
@@ -24,7 +19,6 @@ export interface Store {
   sharedWith: string[];           // User IDs of users with access
   pendingShares: string[];        // Emails of invited users who haven't signed up
   sections: StoreSection[];
-  location?: StoreLocation;       // Optional store location for proximity features
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

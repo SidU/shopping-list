@@ -5,39 +5,40 @@ import { useRouter } from 'next/navigation';
 import { useStores } from '@/lib/hooks/useStore';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTheme } from '@/lib/contexts/ThemeContext';
-import { useGeolocation, findNearestStore } from '@/lib/hooks/useGeolocation';
+import { useGeolocation, findNearestStoreByPlaces, NearbyStoreMatch } from '@/lib/hooks/useGeolocation';
 import { Header } from '@/components/shared/Header';
 import { StoreCard } from '@/components/stores/StoreCard';
 import { FullPageLoading } from '@/components/shared/LoadingSpinner';
 import { LoginButton } from '@/components/auth/LoginButton';
 import { Button } from '@/components/ui/button';
-import { Plus, ShoppingCart, Settings, MapPin, Navigation } from 'lucide-react';
+import { Plus, ShoppingCart, Settings, Navigation, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
   const { user, isLoading: authLoading } = useAuth();
   const { stores, loading: storesLoading } = useStores();
   const { theme } = useTheme();
-  const { latitude, longitude, loading: locationLoading, getLocation } = useGeolocation();
+  const { latitude, longitude, loading: locationLoading, error: locationError, getLocation } = useGeolocation();
   const router = useRouter();
   
-  // Track if we've already attempted auto-navigation this session
-  const [autoNavAttempted, setAutoNavAttempted] = useState(false);
-  const [nearestStoreInfo, setNearestStoreInfo] = useState<{ name: string; distance: number } | null>(null);
+  // Track state
+  const [checkingNearby, setCheckingNearby] = useState(false);
+  const [nearbyMatch, setNearbyMatch] = useState<NearbyStoreMatch | null>(null);
+  const [checkedNearby, setCheckedNearby] = useState(false);
   const hasNavigatedRef = useRef(false);
 
   // Request location on mount
   useEffect(() => {
-    if (!autoNavAttempted) {
+    if (!checkedNearby && !locationLoading) {
       getLocation();
-      setAutoNavAttempted(true);
     }
-  }, [autoNavAttempted, getLocation]);
+  }, [checkedNearby, locationLoading, getLocation]);
 
-  // Auto-navigate to nearest store when we have both location and stores
+  // Check for nearby stores when we have location
   useEffect(() => {
     if (
       hasNavigatedRef.current ||
+      checkedNearby ||
       locationLoading ||
       storesLoading ||
       authLoading ||
@@ -48,27 +49,38 @@ export default function HomePage() {
       return;
     }
 
-    const nearest = findNearestStore(stores, latitude, longitude);
-    
-    if (nearest && nearest.distance < 1) {
-      // Within 1km - auto-navigate
-      hasNavigatedRef.current = true;
-      router.push(`/stores/${nearest.store.id}`);
-    } else if (nearest) {
-      // Show info about nearest store but don't auto-navigate
-      setNearestStoreInfo({
-        name: nearest.store.name,
-        distance: nearest.distance,
-      });
-    }
-  }, [latitude, longitude, stores, storesLoading, authLoading, locationLoading, router]);
+    const checkNearbyStores = async () => {
+      setCheckingNearby(true);
+      try {
+        const match = await findNearestStoreByPlaces(
+          stores.map(s => ({ id: s.id, name: s.name })),
+          latitude,
+          longitude,
+          2 // Max 2km for auto-navigation
+        );
+
+        if (match && match.distance < 1) {
+          // Within 1km - auto-navigate
+          hasNavigatedRef.current = true;
+          router.push(`/stores/${match.storeId}`);
+        } else if (match) {
+          // Show info but don't auto-navigate
+          setNearbyMatch(match);
+        }
+      } catch (error) {
+        console.error('Error checking nearby stores:', error);
+      } finally {
+        setCheckingNearby(false);
+        setCheckedNearby(true);
+      }
+    };
+
+    checkNearbyStores();
+  }, [latitude, longitude, stores, storesLoading, authLoading, locationLoading, checkedNearby, router]);
 
   if (authLoading || storesLoading) {
     return <FullPageLoading />;
   }
-
-  const storesWithLocation = stores.filter(s => s.location);
-  const storesWithoutLocation = stores.filter(s => !s.location);
 
   return (
     <div className={`min-h-screen bg-background ${theme === 'pixel' ? 'pixel-grid starfield' : 'grid-bg'}`}>
@@ -107,30 +119,47 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Nearest store banner */}
-            {nearestStoreInfo && (
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-center gap-3">
-                <Navigation className="w-5 h-5 text-primary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">
-                    Nearest: {nearestStoreInfo.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {nearestStoreInfo.distance.toFixed(1)} km away
-                  </p>
+            {/* Location status / nearby store banner */}
+            {(locationLoading || checkingNearby) && (
+              <div className="bg-muted/50 border rounded-lg p-3 flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  {locationLoading ? 'Getting your location...' : 'Checking for nearby stores...'}
+                </p>
+              </div>
+            )}
+
+            {nearbyMatch && !checkingNearby && (
+              <Link href={`/stores/${nearbyMatch.storeId}`}>
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-center gap-3 hover:bg-primary/15 transition-colors cursor-pointer">
+                  <Navigation className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">
+                      {nearbyMatch.place.name} is nearby!
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {nearbyMatch.distance < 1 
+                        ? `${Math.round(nearbyMatch.distance * 1000)}m away`
+                        : `${nearbyMatch.distance.toFixed(1)} km away`
+                      }
+                      {nearbyMatch.place.address && ` · ${nearbyMatch.place.address}`}
+                    </p>
+                  </div>
                 </div>
+              </Link>
+            )}
+
+            {locationError && checkedNearby && (
+              <div className="bg-muted/50 border rounded-lg p-3">
+                <p className="text-sm text-muted-foreground">
+                  {locationError}. Enable location to auto-open nearby stores.
+                </p>
               </div>
             )}
 
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 {stores.length} store{stores.length !== 1 ? 's' : ''}
-                {storesWithLocation.length > 0 && (
-                  <span className="inline-flex items-center gap-1 ml-2">
-                    <MapPin className="w-3 h-3" />
-                    {storesWithLocation.length} with location
-                  </span>
-                )}
               </p>
               <Link href="/stores/new">
                 <Button size="sm" className="gap-1">
@@ -140,12 +169,8 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Stores with location first, then without */}
             <div className="space-y-4">
-              {storesWithLocation.map((store) => (
-                <StoreCard key={store.id} store={store} showLocation />
-              ))}
-              {storesWithoutLocation.map((store) => (
+              {stores.map((store) => (
                 <StoreCard key={store.id} store={store} />
               ))}
             </div>

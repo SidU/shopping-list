@@ -2,22 +2,20 @@
 
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { Store as StoreIcon, Users, ChevronRight, MapPin } from 'lucide-react';
+import { Store as StoreIcon, Users, ChevronRight } from 'lucide-react';
 import { Store } from '@/lib/types';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTheme } from '@/lib/contexts/ThemeContext';
 
 interface StoreCardProps {
   store: Store;
-  showLocation?: boolean;
 }
 
-export function StoreCard({ store, showLocation }: StoreCardProps) {
+export function StoreCard({ store }: StoreCardProps) {
   const { user } = useAuth();
   const { theme } = useTheme();
   const isShared = store.ownerId !== user?.id;
   const isPixel = theme === 'pixel';
-  const hasLocation = !!store.location;
 
   return (
     <Link href={`/stores/${store.id}`}>
@@ -37,15 +35,6 @@ export function StoreCard({ store, showLocation }: StoreCardProps) {
                     <span className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
                       {isPixel ? 'CO-OP' : 'Shared'}
-                    </span>
-                  </>
-                )}
-                {showLocation && hasLocation && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1 text-primary">
-                      <MapPin className="w-3 h-3" />
-                      {isPixel ? 'GPS' : 'Location'}
                     </span>
                   </>
                 )}
