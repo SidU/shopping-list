@@ -26,6 +26,22 @@ export const completionMessages = [
   { emoji: '🌟', title: "STELLAR PERFORMANCE!", subtitle: "Out of this world shopping" },
 ];
 
+// Pixel arcade themed completion messages
+export const pixelCompletionMessages = [
+  { emoji: '🕹️', title: "LEVEL COMPLETE!", subtitle: "Insert coin to continue..." },
+  { emoji: '👾', title: "HIGH SCORE!", subtitle: "You beat the final boss!" },
+  { emoji: '🎮', title: "GAME OVER... YOU WIN!", subtitle: "+1000 shopping XP" },
+  { emoji: '⭐', title: "PERFECT CLEAR!", subtitle: "All items collected!" },
+  { emoji: '🏅', title: "NEW RECORD!", subtitle: "Your name on the leaderboard!" },
+  { emoji: '💎', title: "BONUS STAGE COMPLETE!", subtitle: "Secret items unlocked!" },
+  { emoji: '🎰', title: "JACKPOT!", subtitle: "Triple cherries! All items got!" },
+  { emoji: '🚀', title: "WARP ZONE CLEARED!", subtitle: "Teleporting to checkout..." },
+  { emoji: '⚡', title: "POWER-UP MAXED!", subtitle: "Shopping skill: LEGENDARY" },
+  { emoji: '🏰', title: "DUNGEON CLEARED!", subtitle: "The grocery dragon defeated!" },
+  { emoji: '🎯', title: "COMBO x999!", subtitle: "Unbelievable streak!" },
+  { emoji: '🌈', title: "RAINBOW ROAD COMPLETE!", subtitle: "You didn't fall off!" },
+];
+
 // Random loading messages
 export const loadingMessages = [
   "Reticulating splines...",
@@ -64,6 +80,10 @@ export function getRandomEmptyMessage() {
 
 export function getRandomCompletionMessage() {
   return getRandomMessage(completionMessages);
+}
+
+export function getRandomPixelCompletionMessage() {
+  return getRandomMessage(pixelCompletionMessages);
 }
 
 export function getRandomLoadingMessage() {

@@ -16,6 +16,7 @@ export function LoginButton() {
               src={user.image}
               alt={user.name || 'User'}
               className="w-8 h-8 rounded-full"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <User className="w-8 h-8 p-1 rounded-full bg-muted" />

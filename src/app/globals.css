@@ -202,6 +202,428 @@
   --font-mono: var(--font-retro-mono), monospace;
 }
 
+/* ==========================================
+   PIXEL ARCADE THEME
+   8-bit retro gaming aesthetic with authentic
+   pixel-art styling and arcade cabinet vibes
+   ========================================== */
+[data-theme="pixel"] {
+  --radius: 0px;
+
+  /* Dark arcade cabinet background with subtle blue tint */
+  --background: oklch(0.10 0.02 260);
+  --foreground: oklch(0.95 0.02 90);
+
+  /* Cards - like game UI panels */
+  --card: oklch(0.14 0.025 260);
+  --card-foreground: oklch(0.95 0.02 90);
+
+  /* Popover */
+  --popover: oklch(0.12 0.025 260);
+  --popover-foreground: oklch(0.95 0.02 90);
+
+  /* Arcade yellow/gold primary - like coin slots */
+  --primary: oklch(0.85 0.20 90);
+  --primary-foreground: oklch(0.10 0 0);
+
+  /* Purple secondary - classic arcade purple */
+  --secondary: oklch(0.45 0.20 300);
+  --secondary-foreground: oklch(0.95 0.02 90);
+
+  /* Muted - darker panels */
+  --muted: oklch(0.20 0.02 260);
+  --muted-foreground: oklch(0.60 0.05 90);
+
+  /* Bright green accent - power-up green */
+  --accent: oklch(0.75 0.30 145);
+  --accent-foreground: oklch(0.10 0 0);
+
+  /* Red for game over / delete */
+  --destructive: oklch(0.60 0.30 25);
+
+  /* Pixel cyan borders */
+  --border: oklch(0.55 0.20 200);
+  --input: oklch(0.18 0.03 260);
+  --ring: oklch(0.85 0.20 90);
+
+  /* Neon palette - arcade colors */
+  --neon-cyan: oklch(0.80 0.20 200);
+  --neon-magenta: oklch(0.70 0.30 330);
+  --neon-green: oklch(0.80 0.30 145);
+  --neon-orange: oklch(0.80 0.25 60);
+
+  /* Pixel blue - like old CRT blue */
+  --pixel-blue: oklch(0.55 0.25 250);
+  /* Hot pink - arcade style */
+  --pixel-pink: oklch(0.70 0.30 350);
+  /* Electric purple */
+  --pixel-purple: oklch(0.55 0.30 300);
+  /* Coin gold */
+  --pixel-gold: oklch(0.85 0.20 90);
+  /* Player 1 red */
+  --pixel-red: oklch(0.60 0.30 25);
+
+  /* Charts */
+  --chart-1: oklch(0.85 0.20 90);
+  --chart-2: oklch(0.80 0.20 200);
+  --chart-3: oklch(0.80 0.30 145);
+  --chart-4: oklch(0.70 0.30 330);
+  --chart-5: oklch(0.80 0.25 60);
+
+  /* Sidebar */
+  --sidebar: oklch(0.12 0.025 260);
+  --sidebar-foreground: oklch(0.95 0.02 90);
+  --sidebar-primary: oklch(0.85 0.20 90);
+  --sidebar-primary-foreground: oklch(0.10 0 0);
+  --sidebar-accent: oklch(0.20 0.03 260);
+  --sidebar-accent-foreground: oklch(0.95 0.02 90);
+  --sidebar-border: oklch(0.45 0.15 200);
+  --sidebar-ring: oklch(0.85 0.20 90);
+
+  /* PIXEL FONTS - authentic 8-bit look */
+  --font-sans: var(--font-pixel-body), monospace;
+  --font-mono: var(--font-pixel), monospace;
+}
+
+/* ==========================================
+   PIXEL THEME: CRT SCANLINE OVERLAY
+   ========================================== */
+[data-theme="pixel"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  z-index: 9999;
+}
+
+/* ==========================================
+   PIXEL THEME: SCREEN FLICKER
+   ========================================== */
+@keyframes pixel-flicker {
+  0%, 100% { opacity: 1; }
+  95% { opacity: 0.92; }
+  97% { opacity: 0.88; }
+}
+
+[data-theme="pixel"] body {
+  animation: pixel-flicker 6s infinite;
+}
+
+/* ==========================================
+   PIXEL THEME: SYNTHWAVE GRID BACKGROUND
+   Classic 80s arcade / Tron style
+   ========================================== */
+[data-theme="pixel"] .pixel-grid {
+  background:
+    /* Horizon glow */
+    radial-gradient(ellipse 120% 30% at 50% 100%, rgba(255, 0, 128, 0.3) 0%, transparent 50%),
+    /* Sun/moon glow at bottom */
+    radial-gradient(ellipse 80% 50% at 50% 105%, rgba(255, 100, 0, 0.15) 0%, transparent 40%),
+    /* Base color */
+    var(--background);
+}
+
+[data-theme="pixel"] .pixel-grid::before {
+  content: '';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background:
+    /* Horizontal grid lines with perspective */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 20px,
+      rgba(0, 255, 255, 0.15) 20px,
+      rgba(0, 255, 255, 0.15) 21px
+    ),
+    /* Vertical lines converging to horizon */
+    linear-gradient(90deg,
+      transparent 0%,
+      transparent 10%,
+      rgba(255, 0, 255, 0.1) 10%,
+      rgba(255, 0, 255, 0.1) 10.5%,
+      transparent 10.5%,
+      transparent 20%,
+      rgba(255, 0, 255, 0.1) 20%,
+      rgba(255, 0, 255, 0.1) 20.5%,
+      transparent 20.5%,
+      transparent 30%,
+      rgba(255, 0, 255, 0.12) 30%,
+      rgba(255, 0, 255, 0.12) 30.5%,
+      transparent 30.5%,
+      transparent 40%,
+      rgba(255, 0, 255, 0.15) 40%,
+      rgba(255, 0, 255, 0.15) 40.5%,
+      transparent 40.5%,
+      transparent 50%,
+      rgba(255, 0, 255, 0.2) 50%,
+      rgba(255, 0, 255, 0.2) 50.5%,
+      transparent 50.5%,
+      transparent 60%,
+      rgba(255, 0, 255, 0.15) 60%,
+      rgba(255, 0, 255, 0.15) 60.5%,
+      transparent 60.5%,
+      transparent 70%,
+      rgba(255, 0, 255, 0.12) 70%,
+      rgba(255, 0, 255, 0.12) 70.5%,
+      transparent 70.5%,
+      transparent 80%,
+      rgba(255, 0, 255, 0.1) 80%,
+      rgba(255, 0, 255, 0.1) 80.5%,
+      transparent 80.5%,
+      transparent 90%,
+      rgba(255, 0, 255, 0.1) 90%,
+      rgba(255, 0, 255, 0.1) 90.5%,
+      transparent 90.5%
+    );
+  pointer-events: none;
+  z-index: -1;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+}
+
+/* Starfield for the top portion */
+[data-theme="pixel"] .starfield {
+  position: relative;
+}
+
+[data-theme="pixel"] .starfield::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background-image:
+    radial-gradient(1px 1px at 5% 10%, white 100%, transparent),
+    radial-gradient(1px 1px at 15% 25%, white 100%, transparent),
+    radial-gradient(1px 1px at 25% 5%, white 100%, transparent),
+    radial-gradient(1px 1px at 35% 35%, rgba(255,255,255,0.8) 100%, transparent),
+    radial-gradient(1px 1px at 45% 15%, white 100%, transparent),
+    radial-gradient(1px 1px at 55% 30%, rgba(255,255,255,0.7) 100%, transparent),
+    radial-gradient(1px 1px at 65% 8%, white 100%, transparent),
+    radial-gradient(1px 1px at 75% 22%, white 100%, transparent),
+    radial-gradient(1px 1px at 85% 38%, rgba(255,255,255,0.9) 100%, transparent),
+    radial-gradient(1px 1px at 95% 12%, white 100%, transparent),
+    radial-gradient(2px 2px at 20% 45%, #ff00ff 100%, transparent),
+    radial-gradient(2px 2px at 70% 50%, #00ffff 100%, transparent),
+    radial-gradient(1px 1px at 40% 42%, white 100%, transparent),
+    radial-gradient(1px 1px at 60% 48%, rgba(255,255,255,0.8) 100%, transparent),
+    radial-gradient(1px 1px at 10% 55%, white 100%, transparent),
+    radial-gradient(1px 1px at 90% 52%, white 100%, transparent);
+  pointer-events: none;
+  z-index: -1;
+  mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+}
+
+/* ==========================================
+   PIXEL THEME: GLOW UTILITIES
+   ========================================== */
+[data-theme="pixel"] .glow-text {
+  text-shadow:
+    0 0 10px currentColor,
+    2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="pixel"] .glow-text-subtle {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="pixel"] .glow-box {
+  box-shadow:
+    4px 4px 0 0 var(--border),
+    8px 8px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="pixel"] .glow-box-subtle {
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="pixel"] .pixel-glow {
+  text-shadow:
+    2px 0 0 var(--neon-cyan),
+    -2px 0 0 var(--neon-magenta),
+    0 2px 0 var(--primary),
+    0 -2px 0 var(--accent);
+}
+
+[data-theme="pixel"] .pixel-glow-box {
+  box-shadow:
+    4px 0 0 0 var(--neon-cyan),
+    -4px 0 0 0 var(--neon-magenta),
+    0 4px 0 0 var(--primary),
+    0 -4px 0 0 var(--accent);
+}
+
+/* ==========================================
+   PIXEL THEME: RAINBOW TEXT ANIMATION
+   ========================================== */
+@keyframes rainbow-cycle {
+  0%, 100% { color: #ff6b6b; }
+  16% { color: #feca57; }
+  33% { color: #48dbfb; }
+  50% { color: #1dd1a1; }
+  66% { color: #5f27cd; }
+  83% { color: #ff9ff3; }
+}
+
+[data-theme="pixel"] .rainbow-text {
+  animation: rainbow-cycle 3s linear infinite;
+}
+
+/* ==========================================
+   PIXEL THEME: BLINK ANIMATION
+   ========================================== */
+@keyframes pixel-blink {
+  0%, 45% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+[data-theme="pixel"] .blink {
+  animation: pixel-blink 1s linear infinite;
+}
+
+[data-theme="pixel"] .blink-slow {
+  animation: pixel-blink 2s linear infinite;
+}
+
+/* ==========================================
+   PIXEL THEME: POWER-UP GLOW
+   ========================================== */
+@keyframes power-up {
+  0%, 100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
+  50% { box-shadow: 0 0 15px var(--primary), 0 0 25px var(--primary), 0 0 35px var(--primary); }
+}
+
+[data-theme="pixel"] .power-up {
+  animation: power-up 1.5s ease-in-out infinite;
+}
+
+/* ==========================================
+   PIXEL THEME: JOYSTICK WIGGLE
+   ========================================== */
+@keyframes joystick-wiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  25% { transform: rotate(5deg) translateX(2px); }
+  50% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg) translateX(-2px); }
+}
+
+[data-theme="pixel"] .joystick-wiggle:hover {
+  animation: joystick-wiggle 0.3s ease-in-out;
+}
+
+/* ==========================================
+   PIXEL THEME: COIN INSERT
+   ========================================== */
+@keyframes coin-insert {
+  0% { transform: translateY(-10px); opacity: 0; }
+  50% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+[data-theme="pixel"] .coin-insert {
+  animation: coin-insert 0.4s ease-out;
+}
+
+/* ==========================================
+   PIXEL THEME: LEVEL UP FLASH
+   ========================================== */
+@keyframes level-up {
+  0%, 100% { background-color: var(--background); transform: scale(1); }
+  50% { background-color: var(--primary); transform: scale(1.02); }
+}
+
+[data-theme="pixel"] .level-up {
+  animation: level-up 0.4s ease-out;
+}
+
+/* ==========================================
+   PIXEL THEME: PIXEL BUTTON
+   ========================================== */
+[data-theme="pixel"] .pixel-button {
+  background: var(--primary);
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.3),
+    0 6px 0 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+[data-theme="pixel"] .pixel-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   PIXEL THEME: CARD STYLING
+   ========================================== */
+[data-theme="pixel"] [data-slot="card"] {
+  border: 4px solid var(--border);
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================
+   PIXEL THEME: INPUT STYLING
+   ========================================== */
+[data-theme="pixel"] input,
+[data-theme="pixel"] textarea {
+  border: 3px solid var(--border);
+  background: var(--input);
+}
+
+[data-theme="pixel"] input:focus,
+[data-theme="pixel"] textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* ==========================================
+   PIXEL THEME: CHECKBOX STYLING
+   ========================================== */
+[data-theme="pixel"] [data-slot="checkbox"] {
+  border: 3px solid var(--border);
+  border-radius: 0;
+}
+
+[data-theme="pixel"] [data-slot="checkbox"][data-state="checked"] {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ==========================================
+   PIXEL THEME: SCROLLBAR
+   ========================================== */
+[data-theme="pixel"] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+[data-theme="pixel"] ::-webkit-scrollbar-track {
+  background: var(--background);
+  border-left: 2px solid var(--border);
+}
+
+[data-theme="pixel"] ::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 2px solid var(--border);
+}
+
+[data-theme="pixel"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

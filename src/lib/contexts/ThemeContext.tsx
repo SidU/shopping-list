@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-export type Theme = 'default' | 'retro';
+export type Theme = 'default' | 'retro' | 'pixel';
 
 interface ThemeContextType {
   theme: Theme;
@@ -21,7 +21,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Load theme from localStorage on mount
     const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
-    if (savedTheme && (savedTheme === 'default' || savedTheme === 'retro')) {
+    if (savedTheme && (savedTheme === 'default' || savedTheme === 'retro' || savedTheme === 'pixel')) {
       setThemeState(savedTheme);
     }
     setMounted(true);
@@ -34,8 +34,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(THEME_KEY, theme);
 
-    // Also toggle dark class for retro theme
-    if (theme === 'retro') {
+    // Also toggle dark class for retro and pixel themes
+    if (theme === 'retro' || theme === 'pixel') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');

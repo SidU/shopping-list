@@ -2,6 +2,7 @@
 
 import { useStores } from '@/lib/hooks/useStore';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { Header } from '@/components/shared/Header';
 import { StoreCard } from '@/components/stores/StoreCard';
 import { FullPageLoading } from '@/components/shared/LoadingSpinner';
@@ -13,13 +14,14 @@ import Link from 'next/link';
 export default function HomePage() {
   const { user, isLoading: authLoading } = useAuth();
   const { stores, loading: storesLoading } = useStores();
+  const { theme } = useTheme();
 
   if (authLoading || storesLoading) {
     return <FullPageLoading />;
   }
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
+    <div className={`min-h-screen bg-background ${theme === 'pixel' ? 'pixel-grid starfield' : 'grid-bg'}`}>
       <Header
         title="My Stores"
         actions={

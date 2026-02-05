@@ -381,11 +381,14 @@ export const uncheckAllItems = async (storeId: string) => {
 
   if (listSnap.exists()) {
     const items = listSnap.data().items || [];
-    const uncheckedItems = items.map((item: ShoppingItem) => ({
-      ...item,
-      checked: false,
-      checkedAt: undefined,
-    }));
+    const uncheckedItems = items.map((item: ShoppingItem) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { checkedAt, ...rest } = item;
+      return {
+        ...rest,
+        checked: false,
+      };
+    });
 
     await updateDoc(listRef, {
       items: uncheckedItems,

@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Settings, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSoundContext } from '@/lib/contexts/SoundContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 
 interface PageProps {
   params: Promise<{ storeId: string }>;
@@ -36,6 +37,7 @@ export default function StorePage({ params }: PageProps) {
   } = useShoppingList(storeId);
 
   const { play } = useSoundContext();
+  const { theme } = useTheme();
   const [showCelebration, setShowCelebration] = useState(false);
   const prevCheckedCount = useRef(checkedCount);
   const hasCelebrated = useRef(false);
@@ -77,7 +79,7 @@ export default function StorePage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 grid-bg">
+    <div className={`min-h-screen bg-background pb-24 ${theme === 'pixel' ? 'pixel-grid starfield' : 'grid-bg'}`}>
       <Header
         title={store.name}
         showBack

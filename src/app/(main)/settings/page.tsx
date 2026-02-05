@@ -10,7 +10,7 @@ import { FullPageLoading } from '@/components/shared/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, UserPlus, User, Palette, Monitor, Zap, Volume2, VolumeX } from 'lucide-react';
+import { LogOut, UserPlus, User, Palette, Monitor, Zap, Volume2, VolumeX, Gamepad2 } from 'lucide-react';
 import { getUserByEmail, shareStore, addPendingShare } from '@/lib/firebase/firestore';
 import { ApiKeyCard } from '@/components/settings/ApiKeyCard';
 
@@ -26,6 +26,12 @@ const themes: { id: Theme; name: string; description: string; icon: React.ReactN
     name: 'Retro Futuristic',
     description: 'Neon cyberpunk vibes',
     icon: <Zap className="w-5 h-5" />,
+  },
+  {
+    id: 'pixel',
+    name: 'Pixel Arcade',
+    description: '8-bit gaming nostalgia',
+    icon: <Gamepad2 className="w-5 h-5" />,
   },
 ];
 
@@ -99,7 +105,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
+    <div className={`min-h-screen bg-background ${theme === 'pixel' ? 'pixel-grid starfield' : 'grid-bg'}`}>
       <Header title="Settings" showBack backHref="/" />
 
       <main className="container px-4 py-6 max-w-lg mx-auto space-y-6">
@@ -115,13 +121,13 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {themes.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => {
                     setTheme(t.id);
-                    play(t.id === 'retro' ? 'powerUp' : 'powerDown');
+                    play(t.id === 'default' ? 'powerDown' : 'powerUp');
                   }}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
                     theme === t.id
@@ -202,6 +208,7 @@ export default function SettingsPage() {
                   src={user.image}
                   alt={user.name || 'User'}
                   className="w-12 h-12 rounded-full"
+                  referrerPolicy="no-referrer"
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">

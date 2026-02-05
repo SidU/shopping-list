@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Share_Tech_Mono, Orbitron } from "next/font/google";
+import { Share_Tech_Mono, Orbitron, Press_Start_2P, VT323 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
 import { ThemeProvider } from "@/lib/contexts/ThemeContext";
@@ -26,6 +26,19 @@ const shareTechMono = Share_Tech_Mono({
 
 const orbitron = Orbitron({
   variable: "--font-retro",
+  subsets: ["latin"],
+});
+
+// Pixel arcade theme fonts
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  variable: "--font-pixel",
+  subsets: ["latin"],
+});
+
+const vt323 = VT323({
+  weight: "400",
+  variable: "--font-pixel-body",
   subsets: ["latin"],
 });
 
@@ -56,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${shareTechMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${shareTechMono.variable} ${pressStart2P.variable} ${vt323.variable} antialiased`}
       >
         <ThemeProvider>
           <SoundProvider>
