@@ -26,8 +26,6 @@ export default function StorePage({ params }: PageProps) {
     items,
     learnedItems,
     loading: listLoading,
-    checkedCount,
-    totalCount,
     addItem,
     toggleItem,
     deleteItem,
@@ -39,6 +37,13 @@ export default function StorePage({ params }: PageProps) {
   const { play } = useSoundContext();
   const { theme } = useTheme();
   const [showCelebration, setShowCelebration] = useState(false);
+
+  // Calculate counts based on visible items only (items with valid sectionIds)
+  const sectionIds = new Set(store?.sections.map(s => s.id) || []);
+  const visibleItems = items.filter(item => sectionIds.has(item.sectionId));
+  const checkedCount = visibleItems.filter(item => item.checked).length;
+  const totalCount = visibleItems.length;
+
   const prevCheckedCount = useRef(checkedCount);
   const hasCelebrated = useRef(false);
 
