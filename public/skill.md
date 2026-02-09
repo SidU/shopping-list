@@ -21,6 +21,27 @@ That's it. Item added.
 
 ---
 
+## ⚠️ CRITICAL: Always Include sectionId!
+
+**Items added WITHOUT a `sectionId` will NOT display in the app!**
+
+Before adding any item:
+1. Fetch the store's sections: `GET /api/stores/{storeId}`
+2. Pick the appropriate section based on item type
+3. Always include `sectionId` in your POST request
+
+**Section mapping guide:**
+- Sauces, spices, canned goods, pasta, rice, oil → **Pantry**
+- Milk, cheese, yogurt, eggs → **Dairy**
+- Fruits, vegetables → **Produce**
+- Chips, drinks, coffee, tea → **Snacks & Beverages**
+- Cleaning supplies, paper goods, toiletries → **Household**
+- Chicken, beef, fish → **Meat & Seafood**
+- Bread, bagels, pastries → **Bakery**
+- Ice cream, frozen meals → **Frozen**
+
+---
+
 ## Authentication
 
 1. User generates API key in **Settings → API Access**
@@ -168,17 +189,19 @@ When user says "add milk", figure out which store:
 
 ## Section Assignment
 
+**⚠️ You MUST assign a section to every item — items without sections won't display!**
+
 Default sections (most stores have these):
 - **Produce** — fruits, vegetables
 - **Dairy** — milk, cheese, yogurt, eggs
 - **Meat & Seafood** — chicken, beef, fish
 - **Bakery** — bread, bagels, pastries
-- **Pantry** — canned goods, pasta, rice, oil
+- **Pantry** — canned goods, pasta, rice, oil, sauces, spices, condiments
 - **Frozen** — ice cream, frozen meals, frozen veggies
 - **Snacks & Beverages** — chips, soda, coffee, tea
 - **Household** — cleaning supplies, paper goods, toiletries
 
-If unsure, check the store's sections first and pick the best match.
+**Always** fetch the store's sections first (`GET /api/stores/{storeId}`) and pick the best match. Never omit `sectionId`.
 
 ---
 
